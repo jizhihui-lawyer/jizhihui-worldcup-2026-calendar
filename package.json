@@ -1,0 +1,16 @@
+{
+  "name": "jizhihui-worldcup-2026-calendar",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "GitHub Pages calendar feed for the 2026 FIFA World Cup schedule and scores.",
+  "scripts": {
+    "test": "node --test",
+    "generate": "node scripts/generate-pages.js",
+    "generate:offline": "node scripts/generate-pages.js --offline"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {}
+}

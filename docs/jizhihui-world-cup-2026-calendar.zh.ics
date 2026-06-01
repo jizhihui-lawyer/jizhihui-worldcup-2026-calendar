@@ -1,0 +1,27 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//jizhihui//World Cup 2026 Calendar//ZH
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+NAME:jizhihui 2026 世界杯赛程与比分
+X-WR-CALNAME:jizhihui 2026 世界杯赛程与比分
+X-WR-CALDESC:jizhihui 制作的 2026 世界杯赛程订阅。
+REFRESH-INTERVAL;VALUE=DURATION:PT30M
+X-PUBLISHED-TTL:PT30M
+BEGIN:VEVENT
+UID:world-cup-2026-jizhihui-updating@jizhihui.github.io
+DTSTAMP:20260601T011428Z
+DTSTART:20260611T000000Z
+DTEND:20260612T000000Z
+SUMMARY:jizhihui 2026 世界杯赛程正在更新
+DESCRIPTION:GitHub Actions 会自动拉取 ESPN 赛程并更新这个订阅
+ 日历。部署完成后，请在 Actions 页面手动运行一次 Update c
+ alendar feed，或等待定时任务自动运行。
+LOCATION:
+URL:https://www.espn.com/soccer/scoreboard?league=fifa.world
+SEQUENCE:0
+LAST-MODIFIED:20260601T011428Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR
