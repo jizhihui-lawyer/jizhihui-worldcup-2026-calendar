@@ -79,6 +79,8 @@ const STAGES_ZH = new Map(
     quarterfinals: "四分之一决赛",
     semifinals: "半决赛",
     "third-place": "季军赛",
+    "third-place-match": "季军赛",
+    "3rd-place-match": "季军赛",
     final: "决赛"
   })
 );
