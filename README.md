@@ -8,6 +8,8 @@ https://<你的 GitHub 用户名>.github.io/jizhihui-worldcup-2026-calendar/jizh
 
 订阅后，日历 App 会显示当天赛程；比赛进行中或结束后，标题会显示比分。日历名称和订阅文件名都以 `jizhihui` 开头，能看出来是你制作的。
 
+日程里同时写入了 `LOCATION`、标准 `GEO` 经纬度和 Apple 日历可识别的结构化地点字段，方便 iPhone / Mac 日历更稳定地显示场馆和地图。
+
 ## 自动更新
 
 `.github/workflows/update-calendar.yml` 会在以下情况更新 `docs/jizhihui-world-cup-2026-calendar.zh.ics`：

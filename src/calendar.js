@@ -85,6 +85,91 @@ const STAGES_ZH = new Map(
   })
 );
 
+const VENUE_GEO = new Map(
+  Object.entries({
+    "AT&T Stadium": {
+      title: "AT&T Stadium",
+      latitude: 32.748138,
+      longitude: -97.093231
+    },
+    "BC Place": {
+      title: "BC Place",
+      latitude: 49.276646,
+      longitude: -123.112564
+    },
+    "BMO Field": {
+      title: "BMO Field",
+      latitude: 43.633087,
+      longitude: -79.418961
+    },
+    "Estadio Akron": {
+      title: "Estadio Akron",
+      latitude: 20.681721,
+      longitude: -103.463135
+    },
+    "Estadio Banorte": {
+      title: "Estadio Banorte",
+      latitude: 19.302837,
+      longitude: -99.150803
+    },
+    "Estadio BBVA": {
+      title: "Estadio BBVA",
+      latitude: 25.669132,
+      longitude: -100.244621
+    },
+    "GEHA Field at Arrowhead Stadium": {
+      title: "GEHA Field at Arrowhead Stadium",
+      latitude: 39.048855,
+      longitude: -94.484474
+    },
+    "Gillette Stadium": {
+      title: "Gillette Stadium",
+      latitude: 42.09079,
+      longitude: -71.264404
+    },
+    "Hard Rock Stadium": {
+      title: "Hard Rock Stadium",
+      latitude: 25.95783,
+      longitude: -80.239326
+    },
+    "Levi's Stadium": {
+      title: "Levi's Stadium",
+      latitude: 37.403297,
+      longitude: -121.969765
+    },
+    "Lincoln Financial Field": {
+      title: "Lincoln Financial Field",
+      latitude: 39.901325,
+      longitude: -75.167862
+    },
+    "Lumen Field": {
+      title: "Lumen Field",
+      latitude: 47.595135,
+      longitude: -122.331917
+    },
+    "Mercedes-Benz Stadium": {
+      title: "Mercedes-Benz Stadium",
+      latitude: 33.755371,
+      longitude: -84.401436
+    },
+    "MetLife Stadium": {
+      title: "MetLife Stadium",
+      latitude: 40.813477,
+      longitude: -74.074951
+    },
+    "NRG Stadium": {
+      title: "NRG Stadium",
+      latitude: 29.684702,
+      longitude: -95.410965
+    },
+    "SoFi Stadium": {
+      title: "SoFi Stadium",
+      latitude: 33.953438,
+      longitude: -118.339447
+    }
+  })
+);
+
 export function getTournamentDateKeys(
   startDate = DEFAULT_START_DATE,
   endDate = DEFAULT_END_DATE
@@ -210,6 +295,7 @@ export function toMatch(event) {
   const durationMinutes = stageSlug === "group-stage" ? 120 : 150;
   const end = new Date(start.getTime() + durationMinutes * 60 * 1000);
   const venue = formatVenue(competition.venue);
+  const venueGeo = venueGeoFor(competition.venue);
   const broadcasts = formatBroadcasts(competition.broadcasts);
   const sourceUrl = firstSummaryLink(event) ?? defaultEspnMatchUrl(event.id);
 
@@ -221,6 +307,7 @@ export function toMatch(event) {
     home: toTeam(home),
     away: toTeam(away),
     venue,
+    venueGeo,
     broadcasts,
     sourceUrl,
     statusState: statusType.state ?? "",
@@ -285,6 +372,7 @@ function buildEventLines(match, generatedAt, reminderMinutes) {
     `SUMMARY:${escapeIcsText(match.summary)}`,
     `DESCRIPTION:${escapeIcsText(match.description)}`,
     `LOCATION:${escapeIcsText(match.location)}`,
+    ...structuredLocationLines(match),
     `URL:${escapeIcsText(match.sourceUrl)}`,
     `SEQUENCE:${match.sequenceSeed}`,
     `LAST-MODIFIED:${formatUtcDateTime(generatedAt)}`,
@@ -304,6 +392,22 @@ function buildEventLines(match, generatedAt, reminderMinutes) {
 
   lines.push("END:VEVENT");
   return lines;
+}
+
+function structuredLocationLines(match) {
+  if (!match.venueGeo) return [];
+
+  const { latitude, longitude, title } = match.venueGeo;
+  return [
+    `GEO:${latitude};${longitude}`,
+    [
+      "X-APPLE-STRUCTURED-LOCATION",
+      "VALUE=URI",
+      "X-APPLE-RADIUS=250",
+      `X-ADDRESS=${escapeIcsParam(match.location)}`,
+      `X-TITLE=${escapeIcsParam(title)}`
+    ].join(";") + `:geo:${latitude},${longitude}`
+  ];
 }
 
 function descriptionZh(match) {
@@ -418,6 +522,12 @@ function formatVenue(venue) {
   return parts.join("，");
 }
 
+function venueGeoFor(venue) {
+  const fullName = String(venue?.fullName ?? "").trim();
+  if (!fullName) return null;
+  return VENUE_GEO.get(fullName) ?? null;
+}
+
 function formatBroadcasts(broadcasts = []) {
   const names = broadcasts.flatMap((broadcast) => broadcast.names ?? []);
   return [...new Set(names)].join("、");
@@ -435,6 +545,15 @@ function defaultEspnMatchUrl(id) {
 function normalizeScore(score) {
   if (score === undefined || score === null || score === "") return "";
   return String(score);
+}
+
+function escapeIcsParam(value) {
+  return String(value ?? "")
+    .replace(/\\/g, "\\\\")
+    .replace(/\r\n|\r|\n/g, " ")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;")
+    .replace(/:/g, "\\:");
 }
 
 function hasUsableScores(match) {

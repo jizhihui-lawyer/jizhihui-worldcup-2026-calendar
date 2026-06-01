@@ -23,6 +23,11 @@ test("pre-match events use Chinese fixture titles", () => {
 
   assert.equal(match.summary, "墨西哥 - 南非");
   assert.equal(match.location, "Estadio Banorte，Mexico City，Mexico");
+  assert.deepEqual(match.venueGeo, {
+    title: "Estadio Banorte",
+    latitude: 19.302837,
+    longitude: -99.150803
+  });
   assert.match(match.description, /赛事：小组赛/);
   assert.match(match.description, /状态：未开赛/);
 });
@@ -56,6 +61,7 @@ test("calendar output is a valid folded ICS feed", () => {
     generatedAt: new Date("2026-06-01T00:00:00Z"),
     reminderMinutes: 30
   });
+  const unfolded = ics.replace(/\r\n /g, "");
 
   assert.match(ics, /^BEGIN:VCALENDAR\r\n/);
   assert.match(ics, /X-WR-CALNAME:jizhihui 2026/);
@@ -63,6 +69,12 @@ test("calendar output is a valid folded ICS feed", () => {
   assert.match(ics, /UID:world-cup-2026-760415@jizhihui\.github\.io/);
   assert.match(ics, /DTSTART:20260611T190000Z/);
   assert.match(ics, /SUMMARY:/);
+  assert.match(unfolded, /GEO:19\.302837;-99\.150803/);
+  assert.match(
+    unfolded,
+    /X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-APPLE-RADIUS=250;X-ADDRESS=/
+  );
+  assert.match(unfolded, /X-TITLE=Estadio Banorte:geo:19\.302837,-99\.150803/);
   assert.match(ics, /BEGIN:VALARM/);
   assert.match(ics, /\r\nEND:VCALENDAR\r\n$/);
 });
